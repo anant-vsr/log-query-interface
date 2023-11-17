@@ -220,7 +220,7 @@ function App() {
   useEffect(() => {
     // Fetch logs when the component mounts
     fetchLogs();
-  }, [queryParams]); // Include queryParams as a dependency to refetch when it changes
+  }, []); // Include queryParams as a dependency to refetch when it changes
 
   const fetchLogs = async () => {
     try {
@@ -423,8 +423,8 @@ function App() {
       </label>
 
       {/* Buttons to trigger search */}
-      <button onClick={handleSearch}>Search</button>
-      <button onClick={fetchLogsByLevel}>Search by Level</button>
+      <button onClick={handleSearch}>Search by Level</button>
+      {/* <button onClick={fetchLogsByLevel}>Search by Level</button> */}
       <button onClick={fetchLogsByMessage}>Search by Message</button>
       <button onClick={fetchLogsByResourceId}>Search by Resource ID</button>
       <button onClick={fetchLogsByTimestampRange}>Search by Timestamp Range</button>
