@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import axios from 'axios';
 
-const LogForm = ({ onLogInsert }) => {
+const LogForm = ({ onLogInsert, token }) => {
   const [logData, setLogData] = useState({
     level: '',
     message: '',
@@ -11,8 +11,8 @@ const LogForm = ({ onLogInsert }) => {
     spanId: '',
     commit: '',
     metadata: {
-      parentResourceId: ''
-    }
+      parentResourceId: '',
+    },
   });
 
   const handleChange = (e) => {
@@ -25,13 +25,13 @@ const LogForm = ({ onLogInsert }) => {
         ...prevData,
         [parent]: {
           ...prevData[parent],
-          [child]: value
-        }
+          [child]: value,
+        },
       }));
     } else {
       setLogData((prevData) => ({
         ...prevData,
-        [name]: value
+        [name]: value,
       }));
     }
   };
@@ -40,7 +40,11 @@ const LogForm = ({ onLogInsert }) => {
     e.preventDefault();
 
     try {
-      await axios.post('http://localhost:5000/ingest', logData);
+      await axios.post('http://localhost:5000/ingest', logData, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
       console.log('Log inserted successfully');
       // Notify the parent component that a log has been inserted
       onLogInsert();
@@ -88,7 +92,12 @@ const LogForm = ({ onLogInsert }) => {
 
       <label>
         Parent Resource ID:
-        <input type="text" name="metadata.parentResourceId" value={logData.metadata.parentResourceId} onChange={handleChange} />
+        <input
+          type="text"
+          name="metadata.parentResourceId"
+          value={logData.metadata.parentResourceId}
+          onChange={handleChange}
+        />
       </label>
 
       {/* Add more input fields for other log properties */}
