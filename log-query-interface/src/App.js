@@ -226,11 +226,19 @@ function App() {
 
 
   useEffect(() => {
-    // Fetch logs when the component mounts
-    if (token) {
-      fetchLogs();
-    }
-  }, [token]); // Include queryParams and token as dependencies to refetch when they change
+  // Check if there's a token in local storage
+  const storedToken = localStorage.getItem('authToken');
+  if (storedToken) {
+    setToken(storedToken);
+  }
+
+  // Fetch logs when the component mounts
+  if (token) {
+    fetchLogs();
+  }
+}, [token]);
+
+// Include queryParams and token as dependencies to refetch when they change
 
   const axiosConfig = {
   headers: {
@@ -348,11 +356,15 @@ const fetchLogsByTimestampRange = async () => {
 
 
   const handleLogin = (token) => {
+    localStorage.setItem('authToken', token);
     setToken(token);
   };
   const handleLogout = () => {
-    setToken('');
-  };
+  // Remove the token from local storage
+  localStorage.removeItem('authToken');
+  setToken('');
+};
+
 
   const handleLogInsert = () => {
     // Trigger a log fetch when a new log is inserted
