@@ -65,3 +65,8 @@ li {
   background-color: white;
   border-radius: 4px;
 }
+
+.error-message {
+  color: red;
+  margin-bottom: 10px;
+}

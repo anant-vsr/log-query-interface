@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
 import axios from 'axios';
 
-const LogForm = ({ onLogInsert, token }) => {
-  const [logData, setLogData] = useState({
+const LogForm = ({ onLogInsert, token, setError }) => {
+  const initialLogData = {
     level: '',
     message: '',
     resourceId: '',
@@ -13,12 +13,13 @@ const LogForm = ({ onLogInsert, token }) => {
     metadata: {
       parentResourceId: '',
     },
-  });
+  };
 
+  const [logData, setLogData] = useState(initialLogData);
+  //const [error, setError] = useState(null);
   const handleChange = (e) => {
     const { name, value } = e.target;
 
-    // If the property is nested (like metadata), handle it separately
     if (name.includes('.')) {
       const [parent, child] = name.split('.');
       setLogData((prevData) => ({
@@ -46,15 +47,21 @@ const LogForm = ({ onLogInsert, token }) => {
         },
       });
       console.log('Log inserted successfully');
-      // Notify the parent component that a log has been inserted
       onLogInsert();
+      setLogData(initialLogData); // Reset form data
+      setError(null); // Clear error message
     } catch (error) {
       console.error('Error inserting log:', error.response.data);
+      setError('Error inserting log. Please try again.'); // Set error message
+      setLogData(initialLogData); // Reset form data even in case of failure
     }
   };
 
+
   return (
-    <form onSubmit={handleSubmit}>
+    <div>
+       {setError && <p className="error-message">{setError}</p>}
+      <form onSubmit={handleSubmit}>
       <label>
         Level:
         <input type="text" name="level" value={logData.level} onChange={handleChange} />
@@ -104,6 +111,8 @@ const LogForm = ({ onLogInsert, token }) => {
 
       <button type="submit">Insert Log</button>
     </form>
+    </div>
+
   );
 };
 

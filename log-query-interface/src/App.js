@@ -208,8 +208,7 @@ import Register from './components/Register'; // Adjust the path as needed
 
 
 function App() {
-  const [logs, setLogs] = useState([]);
-  const [queryParams, setQueryParams] = useState({
+  const initialQueryParams = {
     level: '',
     message: '',
     resourceId: '',
@@ -219,10 +218,13 @@ function App() {
     spanId: '',
     commit: '',
     parentResourceId: '',
-  });
+  };
 
+  const [logs, setLogs] = useState([]);
+  const [queryParams, setQueryParams] = useState(initialQueryParams);
   const [token, setToken] = useState('');
   const [showLogin, setShowLogin] = useState(true);
+  const [error, setError] = useState(null);
 
 
   useEffect(() => {
@@ -373,7 +375,8 @@ const fetchLogsByTimestampRange = async () => {
 
   const handleSearch = () => {
     // Trigger a log fetch when the search button is clicked
-    fetchLogs();
+     fetchLogs();
+    setQueryParams(initialQueryParams); // Reset search form fields
   };
 
 
@@ -402,7 +405,7 @@ const fetchLogsByTimestampRange = async () => {
           <button onClick={handleLogout}>Logout</button>
 
           {/* Log insertion form */}
-          <LogForm token={token} onLogInsert={handleLogInsert} />
+          <LogForm token={token} onLogInsert={handleLogInsert} setError={setError}/>
 
           {/* Input fields for search parameters */}
           <label>
