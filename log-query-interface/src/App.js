@@ -254,16 +254,28 @@ const fetchLogs = async () => {
       params: queryParams,
       ...axiosConfig,
     });
-    setLogs(response.data);
+
+    const fetchedLogs = response.data;
+
+    if (fetchedLogs.length === 0) {
+      setError('No logs found matching the specified criteria.');
+    } else {
+      setError(null); // Clear previous error messages
+    }
+
+    setLogs(fetchedLogs);
   } catch (error) {
     console.error(error);
+    setError('Error fetching logs. Please try again.'); // Set error message
   }
 };
+
+
 
 const fetchLogsByTraceId = async () => {
   try {
     const response = await axios.get('http://localhost:5000/logsByTraceId', {
-      params: { traceId: queryParams.traceId },
+      params: queryParams,
       ...axiosConfig,
     });
     setLogs(response.data);
@@ -275,7 +287,7 @@ const fetchLogsByTraceId = async () => {
 const fetchLogsBySpanId = async () => {
   try {
     const response = await axios.get('http://localhost:5000/logsBySpanId', {
-      params: { spanId: queryParams.spanId },
+      params: queryParams,
       ...axiosConfig,
     });
     setLogs(response.data);
@@ -287,7 +299,7 @@ const fetchLogsBySpanId = async () => {
 const fetchLogsByCommit = async () => {
   try {
     const response = await axios.get('http://localhost:5000/logsByCommit', {
-      params: { commit: queryParams.commit },
+      params: queryParams,
       ...axiosConfig,
     });
     setLogs(response.data);
@@ -299,7 +311,7 @@ const fetchLogsByCommit = async () => {
 const fetchLogsByParentResourceId = async () => {
   try {
     const response = await axios.get('http://localhost:5000/logsByParentResourceId', {
-      params: { parentResourceId: queryParams.parentResourceId },
+      params: queryParams,
       ...axiosConfig,
     });
     setLogs(response.data);
@@ -323,7 +335,7 @@ const fetchLogsByLevel = async () => {
 const fetchLogsByMessage = async () => {
   try {
     const response = await axios.get('http://localhost:5000/logsByMessage', {
-      params: { message: queryParams.message },
+       params: queryParams,
       ...axiosConfig,
     });
     setLogs(response.data);
@@ -335,7 +347,7 @@ const fetchLogsByMessage = async () => {
 const fetchLogsByResourceId = async () => {
   try {
     const response = await axios.get('http://localhost:5000/logsByResourceId', {
-      params: { resourceId: queryParams.resourceId },
+      params: queryParams,
       ...axiosConfig,
     });
     setLogs(response.data);
@@ -347,7 +359,7 @@ const fetchLogsByResourceId = async () => {
 const fetchLogsByTimestampRange = async () => {
   try {
     const response = await axios.get('http://localhost:5000/logsByTimestampRange', {
-      params: { startDate: queryParams.startDate, endDate: queryParams.endDate },
+     params: queryParams,
       ...axiosConfig,
     });
     setLogs(response.data);
@@ -378,11 +390,17 @@ const fetchLogsByTimestampRange = async () => {
      fetchLogs();
     setQueryParams(initialQueryParams); // Reset search form fields
   };
+  const handleSearchtimestamp = () => {
+    // Trigger a log fetch when the search button is clicked
+     fetchLogsByTimestampRange ();
+    setQueryParams(initialQueryParams); // Reset search form fields
+  };
 
 
 
   return (
     <div>
+      
      {!token ? (
   <>
     {!showLogin ? (
@@ -402,11 +420,12 @@ const fetchLogsByTimestampRange = async () => {
           <h1>Log Query Interface</h1>
 
           <p>Welcome! You are logged in.</p>
+          {/* {setError && <p className="error-message">{setError}</p>} */}
           <button onClick={handleLogout}>Logout</button>
 
           {/* Log insertion form */}
           <LogForm token={token} onLogInsert={handleLogInsert} setError={setError}/>
-
+          {/* {setError && <p className="error-message">{setError}</p>} */}
           {/* Input fields for search parameters */}
           <label>
             Level:
@@ -492,14 +511,16 @@ const fetchLogsByTimestampRange = async () => {
           </label>
 
           {/* Buttons to trigger search */}
-          <button onClick={handleSearch}>Search by Level</button>
-          <button onClick={fetchLogsByMessage}>Search by Message</button>
+          <button onClick={handleSearch}>Search</button>
+           <button onClick={handleSearchtimestamp}>Search by Timestamp Range</button>
+          {/* <button onClick={fetchLogsByMessage}>Search by Message</button>
           <button onClick={fetchLogsByResourceId}>Search by Resource ID</button>
-          <button onClick={fetchLogsByTimestampRange}>Search by Timestamp Range</button>
           <button onClick={fetchLogsByTraceId}>Search by Trace ID</button>
           <button onClick={fetchLogsBySpanId}>Search by Span ID</button>
           <button onClick={fetchLogsByCommit}>Search by Commit</button>
-          <button onClick={fetchLogsByParentResourceId}>Search by Parent Resource ID</button>
+          <button onClick={fetchLogsByParentResourceId}>Search by Parent Resource ID</button> */}
+
+          {error && <p className="error-message">{error}</p>}
 
           <ul>
             {logs.map((log) => (

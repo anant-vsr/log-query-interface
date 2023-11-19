@@ -146,49 +146,31 @@ app.post('/ingest', async (req, res) => {
 });
 
 
-// Log ingestion endpoint
-// app.post('/ingest', async (req, res) => {
-//   const logData = req.body;
-
-//   try {
-//     await Log.create(logData);
-//     res.status(200).send('Log ingested successfully');
-//   } catch (error) {
-//     console.error(error);
-//     res.status(500).send('Internal Server Error');
-//   }
-// });
 
 
 
 
-
-// Log retrieval endpoint
-// app.get('/logs', async (req, res) => {
-//   try {
-//     const logs = await Log.find(req.query);
-//     res.status(200).json(logs);
-//   } catch (error) {
-//     console.error(error);
-//     res.status(500).send('Internal Server Error');
-//   }
-// });
-
-
-//new Log retrieval endpoint
-// Log retrieval endpoint
 app.get('/logs', async (req, res) => {
   try {
-    const levelFilter = req.query.level;
+    // Extracting filters from query parameters
+    const { level, message, resourceId, traceId, spanId, commit, parentResourceId } = req.query;
 
-    // Full-text search
-    const fullTextSearch = req.query.q;
-    const fullTextSearchQuery = fullTextSearch ? { $text: { $search: fullTextSearch } } : {};
+    // Construct a filter object based on the provided parameters
+    const filters = {
+      level,
+      message: { $regex: new RegExp(message, 'i') },
+      resourceId,
+      traceId,
+      spanId,
+      commit,
+      'metadata.parentResourceId': parentResourceId,
+      // Add more filters as needed
+    };
 
-    // Combining filters and full-text search
-    const combinedQuery = { level: levelFilter, ...fullTextSearchQuery };
+    // Remove undefined or empty filters
+    Object.keys(filters).forEach(key => (filters[key] === undefined || filters[key] === '') && delete filters[key]);
 
-    const logs = await Log.find(combinedQuery);
+    const logs = await Log.find(filters);
     res.status(200).json(logs);
   } catch (error) {
     console.error(error);
@@ -196,11 +178,29 @@ app.get('/logs', async (req, res) => {
   }
 });
 
+
 // Add a new endpoint for searching logs by message
 app.get('/logsByMessage', async (req, res) => {
-  try {
-    const { message } = req.query;
-    const logs = await Log.find({ message: { $regex: new RegExp(message, 'i') } });
+ try {
+    // Extracting filters from query parameters
+    const { level, message, resourceId, traceId, spanId, commit, parentResourceId } = req.query;
+
+    // Construct a filter object based on the provided parameters
+    const filters = {
+      level,
+      message: { $regex: new RegExp(message, 'i') },
+      resourceId,
+      traceId,
+      spanId,
+      commit,
+      'metadata.parentResourceId': parentResourceId,
+      // Add more filters as needed
+    };
+
+    // Remove undefined or empty filters
+    Object.keys(filters).forEach(key => (filters[key] === undefined || filters[key] === '') && delete filters[key]);
+
+    const logs = await Log.find(filters);
     res.status(200).json(logs);
   } catch (error) {
     console.error(error);
@@ -211,8 +211,25 @@ app.get('/logsByMessage', async (req, res) => {
 // Add a new endpoint for searching logs by resourceId
 app.get('/logsByResourceId', async (req, res) => {
   try {
-    const { resourceId } = req.query;
-    const logs = await Log.find({ resourceId });
+    // Extracting filters from query parameters
+    const { level, message, resourceId, traceId, spanId, commit, parentResourceId } = req.query;
+
+    // Construct a filter object based on the provided parameters
+    const filters = {
+      level,
+      message: { $regex: new RegExp(message, 'i') },
+      resourceId,
+      traceId,
+      spanId,
+      commit,
+      'metadata.parentResourceId': parentResourceId,
+      // Add more filters as needed
+    };
+
+    // Remove undefined or empty filters
+    Object.keys(filters).forEach(key => (filters[key] === undefined || filters[key] === '') && delete filters[key]);
+
+    const logs = await Log.find(filters);
     res.status(200).json(logs);
   } catch (error) {
     console.error(error);
@@ -220,17 +237,136 @@ app.get('/logsByResourceId', async (req, res) => {
   }
 });
 
-// Log retrieval endpoint with timestamp range
+//with traceId
+app.get('/logsByTraceId', async (req, res) => {
+  try {
+  const { level, message, resourceId, traceId, spanId, commit, parentResourceId } = req.query;
+
+    // Construct a filter object based on the provided parameters
+    const filters = {
+      level,
+      message: { $regex: new RegExp(message, 'i') },
+      resourceId,
+      traceId,
+      spanId,
+      commit,
+      'metadata.parentResourceId': parentResourceId,
+      // Add more filters as needed
+    };
+
+    // Remove undefined or empty filters
+    Object.keys(filters).forEach(key => (filters[key] === undefined || filters[key] === '') && delete filters[key]);
+
+    const logs = await Log.find(filters);
+    res.status(200).json(logs);
+  } catch (error) {
+    console.error(error);
+    res.status(500).send('Internal Server Error');
+  }
+});
+
+//with spanId
+app.get('/logsBySpanId', async (req, res) => {
+ try {
+    // Extracting filters from query parameters
+    const { level, message, resourceId, traceId, spanId, commit, parentResourceId } = req.query;
+
+    // Construct a filter object based on the provided parameters
+    const filters = {
+      level,
+      message: { $regex: new RegExp(message, 'i') },
+      resourceId,
+      traceId,
+      spanId,
+      commit,
+      'metadata.parentResourceId': parentResourceId,
+      // Add more filters as needed
+    };
+
+    // Remove undefined or empty filters
+    Object.keys(filters).forEach(key => (filters[key] === undefined || filters[key] === '') && delete filters[key]);
+
+    const logs = await Log.find(filters);
+    res.status(200).json(logs);
+  } catch (error) {
+    console.error(error);
+    res.status(500).send('Internal Server Error');
+  }
+});
+
+//with commit
+app.get('/logsByCommit', async (req, res) => {
+ try {
+    // Extracting filters from query parameters
+    const { level, message, resourceId, traceId, spanId, commit, parentResourceId } = req.query;
+
+    // Construct a filter object based on the provided parameters
+    const filters = {
+      level,
+      message: { $regex: new RegExp(message, 'i') },
+      resourceId,
+      traceId,
+      spanId,
+      commit,
+      'metadata.parentResourceId': parentResourceId,
+      // Add more filters as needed
+    };
+
+    // Remove undefined or empty filters
+    Object.keys(filters).forEach(key => (filters[key] === undefined || filters[key] === '') && delete filters[key]);
+
+    const logs = await Log.find(filters);
+    res.status(200).json(logs);
+  } catch (error) {
+    console.error(error);
+    res.status(500).send('Internal Server Error');
+  }
+});
+
+//with ParentResourceId
+app.get('/logsByParentResourceId', async (req, res) => {
+  try {
+    // Extracting filters from query parameters
+    const { level, message, resourceId, traceId, spanId, commit, parentResourceId } = req.query;
+
+    // Construct a filter object based on the provided parameters
+    const filters = {
+      level,
+      message: { $regex: new RegExp(message, 'i') },
+      resourceId,
+      traceId,
+      spanId,
+      commit,
+      'metadata.parentResourceId': parentResourceId,
+      // Add more filters as needed
+    };
+
+    // Remove undefined or empty filters
+    Object.keys(filters).forEach(key => (filters[key] === undefined || filters[key] === '') && delete filters[key]);
+
+    const logs = await Log.find(filters);
+    res.status(200).json(logs);
+  } catch (error) {
+    console.error(error);
+    res.status(500).send('Internal Server Error');
+  }
+});
 app.get('/logsByTimestampRange', async (req, res) => {
   try {
     // Extracting filters
-    const filters = {
-      level: req.query.level,
-      message: req.query.message,
-      resourceId: req.query.resourceId,
-      'metadata.parentResourceId': req.query['metadata.parentResourceId'],
-    };
+    const { level, message, resourceId, traceId, spanId, commit, parentResourceId } = req.query;
 
+    // Construct a filter object based on the provided parameters
+    const filters = {
+      level,
+      message: { $regex: new RegExp(message, 'i') },
+      resourceId,
+      traceId,
+      spanId,
+      commit,
+      'metadata.parentResourceId': parentResourceId,
+      // Add more filters as needed
+    };
     // Removing undefined or empty filters
     Object.keys(filters).forEach(key => (filters[key] === undefined || filters[key] === '') && delete filters[key]);
 
@@ -246,62 +382,6 @@ app.get('/logsByTimestampRange', async (req, res) => {
     }
 
     const logs = await Log.find(filters);
-    res.status(200).json(logs);
-  } catch (error) {
-    console.error(error);
-    res.status(500).send('Internal Server Error');
-  }
-});
-
-//with traceId
-app.get('/logsByTraceId', async (req, res) => {
-  try {
-    const { traceId } = req.query;
-
-    // Assuming traceId is a field in your logs schema
-    const logs = await Log.find({ traceId });
-    res.status(200).json(logs);
-  } catch (error) {
-    console.error(error);
-    res.status(500).send('Internal Server Error');
-  }
-});
-
-//with spanId
-app.get('/logsBySpanId', async (req, res) => {
-  try {
-    const { spanId } = req.query;
-
-    // Assuming spanId is a field in your logs schema
-    const logs = await Log.find({ spanId });
-    res.status(200).json(logs);
-  } catch (error) {
-    console.error(error);
-    res.status(500).send('Internal Server Error');
-  }
-});
-
-//with commit
-app.get('/logsByCommit', async (req, res) => {
-  try {
-    const { commit } = req.query;
-
-    // Assuming commit is a field in your logs schema
-    const logs = await Log.find({ commit });
-    res.status(200).json(logs);
-  } catch (error) {
-    console.error(error);
-    res.status(500).send('Internal Server Error');
-  }
-});
-
-//with ParentResourceId
-app.get('/logsByParentResourceId', async (req, res) => {
-  try {
-    const { parentResourceId } = req.query;
-
-    // Assuming metadata.parentResourceId is a field in your logs schema
-    const logs = await Log.find({ 'metadata.parentResourceId': parentResourceId });
     res.status(200).json(logs);
   } catch (error) {
     console.error(error);
